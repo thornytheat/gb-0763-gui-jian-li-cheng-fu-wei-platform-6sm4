@@ -1,4 +1,5 @@
 from app.archive.save import retrieve
+from app.correction.revise import validity
 from app.errors import TrackError
 from .packet import fingerprint, packet
 
@@ -18,4 +19,5 @@ def verified(archive, run_id):
         saved = db.execute('SELECT seal FROM issues WHERE run_id=?', (run_id,)).fetchone()
     if saved is None:
         raise TrackError('NOT_ISSUED', 409)
-    return {'seal': saved[0], 'verified': saved[0] == fingerprint(data), 'evidence': data}
+    return {'seal': saved[0], 'verified': saved[0] == fingerprint(data), 'evidence': data,
+            'validity': validity(archive, run_id)}

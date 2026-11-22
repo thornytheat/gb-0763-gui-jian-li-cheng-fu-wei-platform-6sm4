@@ -36,6 +36,9 @@ const picker = document.querySelector('#run');
 picker?.addEventListener('change', () => {
   download.hidden = true;
   document.querySelector('#seal').textContent = '';
+  const address = new URL('/work/issue', location.origin);
+  address.search = new URLSearchParams({run: picker.value, sample: issue.dataset.sample});
+  location.assign(address);
 });
 handle(issue, async () => {
   const run = picker.value;

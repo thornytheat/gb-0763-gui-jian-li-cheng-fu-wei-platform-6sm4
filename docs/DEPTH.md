@@ -13,6 +13,7 @@
 | M5 轨段覆盖对账 | 定位覆盖缺口和重叠 | `GET/POST /api/coverage` | `app/coverage/balance.py` | `tests/test_coverage.py` |
 | M6 批次留档复跑 | 运行并找回原始快照 | `POST /api/runs` | `app/archive/save.py` `app/archive/storage.py` | `tests/test_archive.py` |
 | M7 巡检证据签发 | 签发并验证证据件 | `POST /api/runs/{id}/issue` | `app/seals/issue.py` `app/seals/packet.py` | `tests/test_seals.py` |
+| M8 基点更正复算 | 更正错报基点并查旧件仍可认里程 | `POST /api/runs/{id}/corrections` | `app/correction/revise.py` | `tests/test_correction.py` |
 
 ## 陷阱登记
 

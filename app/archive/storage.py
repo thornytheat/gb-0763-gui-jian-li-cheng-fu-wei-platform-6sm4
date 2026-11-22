@@ -10,6 +10,8 @@ class TrackArchive:
         with self.transaction() as db:
             db.execute('CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, payload BLOB NOT NULL)')
             db.execute('CREATE TABLE IF NOT EXISTS issues (run_id TEXT PRIMARY KEY REFERENCES runs(id), seal TEXT NOT NULL)')
+            db.execute('CREATE TABLE IF NOT EXISTS corrections (id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES runs(id), payload BLOB NOT NULL)')
+            db.execute('CREATE INDEX IF NOT EXISTS corrections_run ON corrections(run_id)')
 
     @contextmanager
     def transaction(self):

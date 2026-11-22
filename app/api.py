@@ -1,6 +1,7 @@
-from flask import Blueprint, current_app, jsonify
+from flask import Blueprint, current_app, jsonify, request
 
 from app.archive.save import recent, replay, retrieve
+from app.correction.revise import correct, detail, listing, validity
 from app.inputs import source
 from app.pipeline import inspect
 from app.seals.issue import issue, verified
@@ -63,3 +64,24 @@ def export(run_id):
     response = jsonify(verified(current_app.track_archive, run_id))
     response.headers['Content-Disposition'] = f'attachment; filename="track-{run_id}.json"'
     return response
+
+
+@api.post('/api/runs/<run_id>/corrections')
+def correct_run(run_id):
+    data = correct(current_app.track_archive, run_id, request.get_json(silent=True))
+    return data, 200 if data['reused'] else 201
+
+
+@api.get('/api/runs/<run_id>/corrections')
+def corrections(run_id):
+    return listing(current_app.track_archive, run_id)
+
+
+@api.get('/api/runs/<run_id>/corrections/<correction_id>')
+def get_correction(run_id, correction_id):
+    return detail(current_app.track_archive, run_id, correction_id)
+
+
+@api.get('/api/runs/<run_id>/validity')
+def run_validity(run_id):
+    return validity(current_app.track_archive, run_id)

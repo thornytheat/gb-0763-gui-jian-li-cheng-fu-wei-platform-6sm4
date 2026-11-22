@@ -8,21 +8,29 @@ from app.defects.cluster import consolidate
 STAGES = ('capture', 'anchors', 'chainage', 'defects', 'coverage')
 
 
+def recalculate(events, survey=None):
+    marks, plan = survey if survey is not None else survey_book()
+    anchors = match(events, marks)
+    located = restore(events, anchors['anchors'])
+    return {'anchors': anchors, 'chainage': located,
+            'defects': consolidate(located['projected']),
+            'coverage': balance(plan, located['segments'], located['gaps'])}
+
+
 def inspect(raw, until='coverage', *, survey=None):
     captured = scan(raw)
     results = {'capture': captured}
     if until == 'capture':
         return results
-    marks, plan = survey if survey is not None else survey_book()
-    anchors = match(captured['events'], marks)
-    results['anchors'] = anchors
+    stages = recalculate(captured['events'], survey)
+    results['anchors'] = stages['anchors']
     if until == 'anchors':
         return results
-    located = restore(captured['events'], anchors['anchors'])
-    results['chainage'] = located
+    results['chainage'] = stages['chainage']
     if until == 'chainage':
         return results
+    results['defects'] = stages['defects']
     if until != 'coverage':
-        return dict(results, defects=consolidate(located['projected']))
-    return dict(results, defects=consolidate(located['projected']),
-                coverage=balance(plan, located['segments'], located['gaps']))
+        return results
+    results['coverage'] = stages['coverage']
+    return results

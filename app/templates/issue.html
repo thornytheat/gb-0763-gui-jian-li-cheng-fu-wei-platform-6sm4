@@ -1,4 +1,9 @@
 <div class="work-grid"><section class="panel"><h3>巡检证据单</h3>
-{% if ledger %}<form id="issue-run"><label for="run">归档批次</label><select id="run">{% for item in ledger %}<option value="{{ item.run_id }}" {{ 'selected' if item.run_id == run_id }}>{{ item.run_id[:16] }} · {{ item.summary.mapped_mm }} mm</option>{% endfor %}</select><button>签发证据</button></form>
+{% if ledger %}<form id="issue-run" data-sample="{{ label }}"><label for="run">归档批次</label><select id="run">{% for item in ledger %}<option value="{{ item.run_id }}" {{ 'selected' if item.run_id == run_id }}>{{ item.run_id[:16] }} · {{ item.summary.mapped_mm }} mm</option>{% endfor %}</select><button>签发证据</button></form>
 <a id="download" hidden>下载签发证据</a><output id="seal"></output>{% else %}<p>请先完成一笔批次归档。</p>{% endif %}
+</section><section class="panel"><h3>旧件有效范围</h3>
+{% if validity %}<p>当下仍可认 <b>{{ validity.valid_mm }} mm</b>{% if validity.corrections %} · 已更正 {{ validity.corrections|length }} 次{% endif %}</p>
+{% for part in validity.valid_parts %}<p>{{ part.chain }} · {{ part.start_mm }} → {{ part.end_mm }} mm</p>{% else %}<p>原签发里程均已由更正剔除。</p>{% endfor %}
+{% for item in validity.corrections %}<details><summary>复算批次 <code>{{ item.correction_id[:16] }}</code> · 基点 {{ item.correction.event_id }}</summary><p>{{ item.created_at }} · 复算映射 {{ item.summary.mapped_mm }} mm</p>{% for cut in item.affected_parts %}<p>剔除 {{ cut.chain }} · {{ cut.start_mm }} → {{ cut.end_mm }} mm</p>{% else %}<p>错报基点未采信，无里程剔除。</p>{% endfor %}</details>{% endfor %}
+{% else %}<p>选择归档批次后显示旧件有效里程。</p>{% endif %}
 </section><section class="panel"><h3>随件证据</h3><ul><li>报文原件和隔离行</li><li>双基点、断链与掉线记录</li><li>轨段覆盖与缺陷群清单</li></ul></section></div>
